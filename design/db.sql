@@ -1,5 +1,5 @@
 CREATE TABLE `account` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `username` varchar(255),
   `password` varchar(255),
   `is_actived` integer,
@@ -9,7 +9,7 @@ CREATE TABLE `account` (
 );
 
 CREATE TABLE `user` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `full_name` varchar(255),
   `phone_number` varchar(255),
   `email` varchar(255),
@@ -21,26 +21,26 @@ CREATE TABLE `user` (
 );
 
 CREATE TABLE `employee` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255) UNIQUE,
-  `store_id` varchar(255)
+  `store_id` int(11)
 );
 
 CREATE TABLE `customer` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `status` varchar(255),
   `created_at` timestamp
 );
 
 CREATE TABLE `category` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` varchar(255),
   `is_deleted` bool,
   `url_image` varchar(255)
 );
 
 CREATE TABLE `product` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255) UNIQUE,
   `name` varchar(255),
   `price` decimal,
@@ -51,16 +51,16 @@ CREATE TABLE `product` (
   `created_at` timestamp,
   `updated_at` timestamp,
   `is_deleted` bool,
-  `promotion_id` varchar(255)
+  `promotion_id` int(11)
 );
 
 CREATE TABLE `order` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255) UNIQUE,
-  `customer_id` varcharÏ,
-  `employee_id` varchar(255),
+  `customer_id` int(11),
+  `employee_id` int(11),
   `status` integer,
-  `shipment_id` varchar(255),
+  `shipment_id` int(11),
   `total_money` decimal,
   `created_at` timestamp,
   `reason` varchar(255),
@@ -70,14 +70,14 @@ CREATE TABLE `order` (
 );
 
 CREATE TABLE `cart` (
-  `id` varchar(255) PRIMARY KEY,
-  `customer_id` varchar(255),
-  `product_id` varchar(255)
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `customer_id` int(11),
+  `product_id` int(11)
 );
 
 CREATE TABLE `order_history` (
-  `id` varchar(255) PRIMARY KEY,
-  `order_id` varchar(255),
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `order_id` int(11),
   `action` varchar(255),
   `money_paid` integer,
   `created_at` long,
@@ -87,7 +87,7 @@ CREATE TABLE `order_history` (
 );
 
 CREATE TABLE `promotion` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255),
   `start_day` timestamp,
   `end_day` timestamp,
@@ -99,9 +99,9 @@ CREATE TABLE `promotion` (
 );
 
 CREATE TABLE `order_product` (
-  `id` varchar(255) PRIMARY KEY,
-  `order_id` varchar(255),
-  `product_id` varchar(255),
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `order_id` int(11),
+  `product_id` int(11),
   `product_code` varchar(255),
   `quantity` integer,
   `import_price` decimal,
@@ -109,32 +109,32 @@ CREATE TABLE `order_product` (
 );
 
 CREATE TABLE `product_category` (
-  `product_id` varchar(255),
-  `category_id` varchar(255),
+  `product_id` int(11),
+  `category_id` int(11),
   PRIMARY KEY (`product_id`, `category_id`)
 );
 
 CREATE TABLE `store` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255) UNIQUE,
   `name` varchar(255),
   `is_deleted` bool,
   `phone_number` varchar(255),
-  `address_id` varchar(255)
+  `address_id` int(11)
 );
 
 CREATE TABLE `shipment` (
-  `id` varchar(255) PRIMARY KEY,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255),
   `name` varchar(255),
   `price` decimal,
   `method` varchar(255),
-  `store_id` varchar(255)
+  `store_id` int(11)
 );
 
 CREATE TABLE `cart_product` (
-  `cart_id` varchar(255),
-  `product_id` varchar(255),
+  `cart_id` int(11),
+  `product_id` int(11),
   `quantity` integer,
   `price` integer,
   PRIMARY KEY (`cart_id`, `product_id`)
