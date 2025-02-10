@@ -1,6 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { Category } from "@/api/category/categoryModel";
+import type {
+  Category,
+  CategoryParams,
+  CreateCategoryPayload,
+  UpdateCategoryPayload,
+} from "@/api/category/categoryModel";
 import { CategoryRepository } from "@/api/category/categoryRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -13,28 +18,75 @@ export class CategoryService {
     this.categoryRepository = repository;
   }
 
-  // Retrieves all users from the database
   async findAll(): Promise<ServiceResponse<Category[] | null>> {
     try {
-      const users = await this.categoryRepository.findAllAsync();
-      return ServiceResponse.success<Category[]>("Success", users);
+      const categories = await this.categoryRepository.findAllAsync();
+      return ServiceResponse.success<Category[]>("Success", categories);
     } catch (ex) {
-      const errorMessage = `Error finding all users: $${(ex as Error).message}`;
+      const errorMessage = `Error finding all categories: $${(ex as Error).message}`;
       logger.error(errorMessage);
       return ServiceResponse.failure("Failed", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   async findById(req: Request, res: Response): Promise<ServiceResponse<Category | null>> {
     try {
-      const user = await this.categoryRepository.findByIdAsync(req, res);
-      if (!user) {
-        return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
+      const category = await this.categoryRepository.findByIdAsync(req, res);
+      if (!category) {
+        return ServiceResponse.failure("Category not found", null, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success<Category>("User found", user);
+      return ServiceResponse.success<Category>("Category found", category);
     } catch (ex) {
-      const errorMessage = `Error finding user with id ${req.params.id}:, ${(ex as Error).message}`;
+      const errorMessage = `Error finding category with id ${req.params.id}:, ${(ex as Error).message}`;
       logger.error(errorMessage);
-      return ServiceResponse.failure("An error occurred while finding user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      return ServiceResponse.failure(
+        "An error occurred while finding category.",
+        null,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  async create(req: Request<any, any, CreateCategoryPayload>): Promise<ServiceResponse<Category | null>> {
+    try {
+      const category = await this.categoryRepository.createAsync(req);
+      if (!category) return ServiceResponse.failure("Failed to create category", null, StatusCodes.BAD_REQUEST);
+      return ServiceResponse.success<Category>("Category created", category);
+    } catch (ex) {
+      const errorMessage = `Error creating category, ${(ex as Error).message}`;
+      logger.error(errorMessage);
+      return ServiceResponse.failure(
+        "An error occurred while finding category.",
+        null,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  async delete(req: Request): Promise<ServiceResponse<any>> {
+    try {
+      await this.categoryRepository.deleteAsync(req);
+      return ServiceResponse.success<any>("Category deleted", {});
+    } catch (ex) {
+      const errorMessage = `Error deleting category, ${(ex as Error).message}`;
+      logger.error(errorMessage);
+      return ServiceResponse.failure(
+        "An error occurred while finding category.",
+        {},
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  async update(req: Request<any, any, UpdateCategoryPayload>): Promise<ServiceResponse<Category | null>> {
+    try {
+      const category = await this.categoryRepository.updateAsync(req);
+      if (!category) return ServiceResponse.failure("Failed to update category", null, StatusCodes.BAD_REQUEST);
+      return ServiceResponse.success<Category>("Category created", category);
+    } catch (ex) {
+      const errorMessage = `Error updating category, ${(ex as Error).message}`;
+      logger.error(errorMessage);
+      return ServiceResponse.failure(
+        "An error occurred while finding category.",
+        null,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
