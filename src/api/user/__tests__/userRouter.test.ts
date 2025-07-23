@@ -12,7 +12,6 @@ describe("User API Endpoints", () => {
       // Act
       const response = await request(app).get("/users");
       const responseBody: ServiceResponse<User[]> = response.body;
-
       // Assert
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(responseBody.success).toBeTruthy();
@@ -31,7 +30,6 @@ describe("User API Endpoints", () => {
       // Act
       const response = await request(app).get(`/users/${testId}`);
       const responseBody: ServiceResponse<User> = response.body;
-
       // Assert
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(responseBody.success).toBeTruthy();
