@@ -1,25 +1,30 @@
 import { env } from "@/common/utils/envConfig";
-import mysql, { type Connection } from "mysql2";
+import { type Pool, createPool } from "mysql2/promise";
+
+const pool: Pool = createPool({
+  host: "localhost",
+  user: "root",
+  password: "", // Your MySQL password
+  database: "testdb", // Your database name
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
 
 class Database {
   private static instance: Database;
-  private connection: Connection;
+  private connection: Pool;
 
   private constructor() {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = env;
-    this.connection = mysql.createConnection({
+    this.connection = createPool({
       host: DB_HOST,
       user: DB_USER,
       password: DB_PASSWORD,
       database: DB_NAME,
-    });
-
-    this.connection.connect((err) => {
-      if (err) {
-        console.error("Error connecting to the database:", err);
-      } else {
-        console.log("Connected to MySQL database!");
-      }
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
     });
   }
 
@@ -30,7 +35,7 @@ class Database {
     return Database.instance;
   }
 
-  public getConnection(): Connection {
+  public getConnection(): Pool {
     return this.connection;
   }
 }
