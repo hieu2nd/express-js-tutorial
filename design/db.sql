@@ -46,7 +46,6 @@ CREATE TABLE `product` (
   `name` varchar(255),
   `price` decimal,
   `unit` varchar(255),
-  `origin` varchar(255),
   `description` varchar(255),
   `rating` integer,
   `created_at` timestamp,

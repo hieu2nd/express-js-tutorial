@@ -13,7 +13,6 @@ export const productRouter: Router = express.Router();
 
 //get list
 productRegistry.register("Product", ProductSchema);
-
 productRegistry.registerPath({
   method: "get",
   path: "/product",
