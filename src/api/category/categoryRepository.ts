@@ -33,7 +33,7 @@ export class CategoryRepository {
   async createAsync(req: Request<any, any, CreateCategoryPayload>): Promise<Category | null> {
     try {
       const rows = await this.connection.query<[RowDataPacket[], ResultSetHeader]>(
-        "INSERT INTO category (name,is_deleted,image_url,is_shown) VALUES (?,0,?,0)",
+        "INSERT INTO category (name,is_deleted,image_url,is_shown) VALUES (?,0,?,1)",
         [req.body.name, req.body.image_url],
       );
       const insertId = (rows[0] as RowDataPacket).insertId;

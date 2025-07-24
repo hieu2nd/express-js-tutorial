@@ -17,4 +17,7 @@ export const env = cleanEnv(process.env, {
   DB_USER: str({ devDefault: testOnly("root") }),
   DB_PASSWORD: str({ devDefault: testOnly("123456") }),
   DB_NAME: str({ devDefault: testOnly("flower_shop") }),
+  JWT_SECRET: str({ devDefault: testOnly("your-secret-key") }),
+  JWT_EXPIRES_IN: str({ devDefault: testOnly("24h") }),
+  REFRESH_TOKEN_EXPIRES_IN: str({ devDefault: testOnly("7d") }),
 });

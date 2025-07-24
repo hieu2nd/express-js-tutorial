@@ -9,6 +9,7 @@ import {
   GetCategorySchema,
   UpdateCategorySchema,
 } from "@/api/category/categoryModel";
+import { authenticateToken } from "@/common/middleware/authMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { categoryController } from "./categoryController";
 
@@ -17,13 +18,16 @@ export const categoryRouter: Router = express.Router();
 
 //get list
 categoryRegistry.register("Category", CategorySchema);
+
 categoryRegistry.registerPath({
   method: "get",
   path: "/category",
   tags: ["Category"],
   responses: createApiResponse(z.array(CategorySchema), "Success"),
 });
+
 categoryRouter.get("/", categoryController.getCategories);
+
 //get detail
 categoryRegistry.registerPath({
   method: "get",
@@ -32,12 +36,15 @@ categoryRegistry.registerPath({
   request: { params: GetCategorySchema.shape.params },
   responses: createApiResponse(CategorySchema, "Success"),
 });
+
 categoryRouter.get("/:id", validateRequest(GetCategorySchema), categoryController.getCategory);
+
 //create
 categoryRegistry.registerPath({
   method: "post",
   path: "/category",
   tags: ["Category"],
+  security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
@@ -47,12 +54,15 @@ categoryRegistry.registerPath({
   },
   responses: createApiResponse(CategorySchema, "Success"),
 });
-categoryRouter.post("/", validateRequest(CreateCategorySchema), categoryController.createCategory);
+
+categoryRouter.post("/", authenticateToken, validateRequest(CreateCategorySchema), categoryController.createCategory);
+
 //delete
 categoryRegistry.registerPath({
   method: "delete",
   path: "/category/{id}",
   tags: ["Category"],
+  security: [{ bearerAuth: [] }],
   request: { params: GetCategorySchema.shape.params },
   responses: {
     200: {
@@ -63,12 +73,15 @@ categoryRegistry.registerPath({
     },
   },
 });
-categoryRouter.delete("/:id", validateRequest(GetCategorySchema), categoryController.deleteCategory);
+
+categoryRouter.delete("/:id", authenticateToken, validateRequest(GetCategorySchema), categoryController.deleteCategory);
+
 //update
 categoryRegistry.registerPath({
   method: "put",
   path: "/category/{id}",
   tags: ["Category"],
+  security: [{ bearerAuth: [] }],
   request: {
     params: GetCategorySchema.shape.params,
     body: {
@@ -79,4 +92,5 @@ categoryRegistry.registerPath({
   },
   responses: createApiResponse(CategorySchema, "Success"),
 });
-categoryRouter.put("/:id", validateRequest(UpdateCategorySchema), categoryController.updateCategory);
+
+categoryRouter.put("/:id", authenticateToken, validateRequest(UpdateCategorySchema), categoryController.updateCategory);

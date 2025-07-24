@@ -2,14 +2,14 @@ CREATE TABLE `account` (
   `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `username` varchar(255),
   `password` varchar(255),
-  `is_actived` integer,
+  `is_active` integer,
   `created_at` timestamp,
   `updated_at` timestamp,
   `is_deleted` bool
 );
 
 CREATE TABLE `user` (
-  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `id` int(11) PRIMARY KEY NOT NULL,
   `full_name` varchar(255),
   `phone_number` varchar(255),
   `email` varchar(255),
@@ -21,13 +21,13 @@ CREATE TABLE `user` (
 );
 
 CREATE TABLE `employee` (
-  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `id` int(11) PRIMARY KEY NOT NULL,
   `code` varchar(255) UNIQUE,
   `store_id` int(11)
 );
 
 CREATE TABLE `customer` (
-  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `id` int(11) PRIMARY KEY NOT NULL,
   `status` varchar(255),
   `created_at` timestamp
 );
@@ -36,7 +36,8 @@ CREATE TABLE `category` (
   `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` varchar(255),
   `is_deleted` bool,
-  `url_image` varchar(255)
+  `image_url` varchar(255),
+  `is_shown` bool,
 );
 
 CREATE TABLE `product` (
@@ -144,9 +145,9 @@ ALTER TABLE `user` ADD FOREIGN KEY (`id`) REFERENCES `account` (`id`);
 
 ALTER TABLE `customer` ADD FOREIGN KEY (`id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `user` ADD FOREIGN KEY (`id`) REFERENCES `employee` (`id`);
+ALTER TABLE `employee` ADD FOREIGN KEY (`id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `cart` ADD FOREIGN KEY (`id`) REFERENCES `customer` (`id`);
+ALTER TABLE `cart` ADD FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`);
 
 ALTER TABLE `product` ADD FOREIGN KEY (`promotion_id`) REFERENCES `promotion` (`id`);
 
