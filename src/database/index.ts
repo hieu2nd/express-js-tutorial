@@ -1,16 +1,6 @@
 import { env } from "@/common/utils/envConfig";
 import { type Pool, createPool } from "mysql2/promise";
 
-const pool: Pool = createPool({
-  host: "localhost",
-  user: "root",
-  password: "", // Your MySQL password
-  database: "testdb", // Your database name
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
-
 class Database {
   private static instance: Database;
   private connection: Pool;
