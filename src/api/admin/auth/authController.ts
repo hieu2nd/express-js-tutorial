@@ -1,9 +1,16 @@
 import type { Request, RequestHandler, Response } from "express";
 
-import { authService } from "@/api/auth/authService";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
+import { authService } from "./authService";
 
-class AuthController {
+interface IAuthController {
+  login: RequestHandler;
+  registerCustomer: RequestHandler;
+  refreshToken: RequestHandler;
+  verifyToken: RequestHandler;
+}
+
+class AuthController implements IAuthController {
   public login: RequestHandler = async (req: Request, res: Response) => {
     const serviceResponse = await authService.login(req);
     return handleServiceResponse(serviceResponse, res);

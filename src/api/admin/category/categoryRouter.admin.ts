@@ -8,10 +8,10 @@ import {
   CreateCategorySchema,
   GetCategorySchema,
   UpdateCategorySchema,
-} from "@/api/category/categoryModel";
+} from "@/api/client/category/categoryModel";
 import { authenticateToken } from "@/common/middleware/authMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
-import { categoryController } from "./categoryController";
+import { categoryController } from "./categoryController.admin";
 
 export const categoryRegistry = new OpenAPIRegistry();
 export const categoryRouter: Router = express.Router();

@@ -1,17 +1,22 @@
 import type { Request, RequestHandler, Response } from "express";
 
-import { categoryService } from "@/api/category/categoryService";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
-import { logger } from "@/server";
-import * as core from "express-serve-static-core";
-import { CategoryParams, type CreateCategoryPayload, type UpdateCategoryPayload } from "./categoryModel";
+import type { CreateCategoryPayload, UpdateCategoryPayload } from "./categoryModel.admin";
+import { categoryService } from "./categoryService.admin";
 
-class CategoryController {
+interface ICategoryController {
+  getCategories: RequestHandler;
+  getCategory: RequestHandler;
+  createCategory: RequestHandler;
+  deleteCategory: RequestHandler;
+  updateCategory: RequestHandler;
+}
+
+class CategoryController implements ICategoryController {
   public getCategories: RequestHandler = async (_req: Request, res: Response) => {
     const serviceResponse = await categoryService.findAll();
     return handleServiceResponse(serviceResponse, res);
   };
-
   public getCategory: RequestHandler = async (req: Request, res: Response) => {
     const serviceResponse = await categoryService.findById(req, res);
     return handleServiceResponse(serviceResponse, res);

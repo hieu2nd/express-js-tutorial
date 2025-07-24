@@ -3,7 +3,12 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { CreateProductSchema, GetProductSchema, ProductSchema, UpdateProductSchema } from "@/api/product/productModel";
+import {
+  CreateProductSchema,
+  GetProductSchema,
+  ProductSchema,
+  UpdateProductSchema,
+} from "@/api/client/product/productModel";
 import { authenticateToken, optionalAuth } from "@/common/middleware/authMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { productController } from "./productController";

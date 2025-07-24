@@ -1,18 +1,27 @@
+import { ApiOptions } from "@/common/models/common";
 import Database from "@/database";
 import { logger } from "@/server";
 import type { Request, Response } from "express";
 import type { RowDataPacket } from "mysql2";
 import type { Pool, ResultSetHeader } from "mysql2/promise";
-import type { Category, CategoryParams, CreateCategoryPayload, UpdateCategoryPayload } from "./categoryModel";
+import type { Category, CreateCategoryPayload } from "./categoryModel.admin";
 
-export class CategoryRepository {
+interface ICategoryRepository {
+  findAllAsync(): Promise<Category[]>;
+  findByIdAsync(req: Request, res: Response): Promise<Category | null>;
+  createAsync(req: Request<any, any, CreateCategoryPayload>): Promise<Category | null>;
+  deleteAsync(req: Request): Promise<any | null>;
+  updateAsync(req: Request): Promise<Category | null>;
+}
+
+export class CategoryRepository implements ICategoryRepository {
   private connection: Pool;
   constructor() {
     this.connection = Database.getInstance().getConnection();
   }
   async findAllAsync(): Promise<Category[]> {
     try {
-      const [rows] = await this.connection.query("SELECT * FROM category WHERE is_deleted = 0");
+      const [rows] = await this.connection.query("SELECT * FROM category WHERE is_deleted = 0 AND is_shown = 1");
       return rows as Category[];
     } catch (error) {
       return [];

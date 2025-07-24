@@ -1,15 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 
-import type {
-  Category,
-  CategoryParams,
-  CreateCategoryPayload,
-  UpdateCategoryPayload,
-} from "@/api/category/categoryModel";
-import { CategoryRepository } from "@/api/category/categoryRepository";
+import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from "@/api/client/category/categoryModel";
+import { ApiOptions } from "@/common/models/common";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 import type { Request, Response } from "express";
+import { CategoryRepository } from "./categoryRepository.admin";
 
 export class CategoryService {
   private categoryRepository: CategoryRepository;
@@ -23,7 +19,7 @@ export class CategoryService {
       const categories = await this.categoryRepository.findAllAsync();
       return ServiceResponse.success<Category[]>("Success", categories);
     } catch (ex) {
-      const errorMessage = `Error finding all categories: $${(ex as Error).message}`;
+      const errorMessage = `Error finding all categories: ${(ex as Error).message}`;
       logger.error(errorMessage);
       return ServiceResponse.failure("Failed", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }

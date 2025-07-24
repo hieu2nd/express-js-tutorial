@@ -3,9 +3,9 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { authController } from "@/api/auth/authController";
-import { CustomerAccountSchema, LoginRequestSchema, RefreshTokenSchema } from "@/api/auth/authModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
+import { authController } from "./authController";
+import { CustomerAccountSchema, LoginRequestSchema, RefreshTokenSchema } from "./authModel";
 
 export const authRegistry = new OpenAPIRegistry();
 export const authRouter: Router = express.Router();

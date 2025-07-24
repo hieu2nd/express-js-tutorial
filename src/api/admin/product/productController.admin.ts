@@ -2,10 +2,18 @@ import type { Request, RequestHandler, Response } from "express";
 
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 import { logger } from "@/server";
-import { CreateProductPayload, UpdateProductPayload } from "./productModel";
-import { productService } from "./productService";
+import { CreateProductPayload, UpdateProductPayload } from "./productModel.admin";
+import { productService } from "./productService.admin";
 
-class ProductController {
+interface IProductController {
+  getProducts: RequestHandler;
+  getProduct: RequestHandler;
+  createProduct: RequestHandler;
+  deleteProduct: RequestHandler;
+  updateProduct: RequestHandler;
+}
+
+class ProductController implements IProductController {
   public getProducts: RequestHandler = async (_req: Request, res: Response) => {
     const serviceResponse = await productService.findAll();
     return handleServiceResponse(serviceResponse, res);

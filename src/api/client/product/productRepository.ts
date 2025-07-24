@@ -5,7 +5,15 @@ import type { RowDataPacket } from "mysql2";
 import type { Pool, ResultSetHeader } from "mysql2/promise";
 import type { CreateProductPayload, Product } from "./productModel";
 
-export class ProductRepository {
+interface IProductRepository {
+  findAllAsync(): Promise<Product[]>;
+  findByIdAsync(req: Request, res: Response): Promise<Product | null>;
+  createAsync(req: Request): Promise<Product | null>;
+  deleteAsync(req: Request): Promise<Record<string, never> | null>;
+  updateAsync(req: Request): Promise<Product | null>;
+}
+
+export class ProductRepository implements IProductRepository {
   private connection: Pool;
   constructor() {
     this.connection = Database.getInstance().getConnection();

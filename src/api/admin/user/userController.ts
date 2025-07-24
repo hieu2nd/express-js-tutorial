@@ -1,9 +1,14 @@
 import type { Request, RequestHandler, Response } from "express";
 
-import { userService } from "@/api/user/userService";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
+import { userService } from "./userService";
 
-class UserController {
+interface IUserController {
+  getUsers: RequestHandler;
+  getUser: RequestHandler;
+}
+
+class UserController implements IUserController {
   public getUsers: RequestHandler = async (_req: Request, res: Response) => {
     const serviceResponse = await userService.findAll();
     return handleServiceResponse(serviceResponse, res);

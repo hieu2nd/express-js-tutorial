@@ -1,11 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { Category, UpdateCategoryPayload } from "@/api/category/categoryModel";
+import type { Category, UpdateCategoryPayload } from "@/api/client/category/categoryModel";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 import type { Request, Response } from "express";
-import { CreateProductPayload, type Product, UpdateProductPayload } from "./productModel";
-import { ProductRepository } from "./productRepository";
+import { CreateProductPayload, type Product, UpdateProductPayload } from "./productModel.admin";
+import { ProductRepository } from "./productRepository.admin";
 
 export class ProductService {
   private productRepository: ProductRepository;

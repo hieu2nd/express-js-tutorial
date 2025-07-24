@@ -1,12 +1,12 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { AuthResponse, CustomerAccountRequest, JwtPayload, LoginRequest } from "@/api/auth/authModel";
-import { authRepository } from "@/api/auth/authRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { env } from "@/common/utils/envConfig";
 import { logger } from "@/server";
 import bcrypt from "bcryptjs";
 import jwt, { sign } from "jsonwebtoken";
+import type { AuthResponse, CustomerAccountRequest, JwtPayload, LoginRequest } from "./authModel";
+import { authRepository } from "./authRepository";
 export class AuthService {
   private readonly JWT_SECRET: string = env.JWT_SECRET;
   private readonly JWT_EXPIRES_IN: string | number = env.JWT_EXPIRES_IN;
