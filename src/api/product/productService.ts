@@ -74,7 +74,7 @@ export class ProductService {
     try {
       const product = await this.productRepository.updateAsync(req);
       if (!product) return ServiceResponse.failure("Failed to update product", null, StatusCodes.BAD_REQUEST);
-      return ServiceResponse.success<Product>("Product created", product);
+      return ServiceResponse.success<Product>("Product updated", product);
     } catch (ex) {
       const errorMessage = `Error updating product, ${(ex as Error).message}`;
       logger.error(errorMessage);

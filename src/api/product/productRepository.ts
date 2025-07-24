@@ -12,7 +12,7 @@ export class ProductRepository {
   }
   async findAllAsync(): Promise<Product[]> {
     try {
-      const [rows] = await this.connection.query("SELECT * FROM category WHERE is_deleted = 0");
+      const [rows] = await this.connection.query("SELECT * FROM product WHERE is_deleted = 0");
       return rows as Product[];
     } catch (error) {
       return [];
@@ -22,7 +22,7 @@ export class ProductRepository {
   async findByIdAsync(req: Request, _: Response): Promise<Product | null> {
     try {
       const [rows] = await this.connection.query<RowDataPacket[]>(
-        "SELECT * FROM category WHERE id = ? AND is_deleted = 0 AND is_shown = 1",
+        "SELECT * FROM product WHERE id = ? AND is_deleted = 0",
         [req.params.id],
       );
       return rows[0] as Product;
@@ -69,7 +69,7 @@ export class ProductRepository {
   async deleteAsync(req: Request): Promise<Record<string, never> | null> {
     try {
       await this.connection.query<[RowDataPacket[], ResultSetHeader]>(
-        "UPDATE category SET is_deleted = 1 WHERE id = ?",
+        "UPDATE product SET is_deleted = 1 WHERE id = ?",
         [req.params.id],
       );
       return {};
@@ -80,28 +80,38 @@ export class ProductRepository {
   }
   async updateAsync(req: Request): Promise<Product | null> {
     try {
-      const values = [];
-      const queryParams = [];
-      if (req.body.name) {
-        values.push(req.body.name);
-        queryParams.push("name = ?");
+      const updateFields: Record<string, any> = {};
+
+      // Build update object dynamically
+      if (req.body.code !== undefined) updateFields.code = req.body.code;
+      if (req.body.name !== undefined) updateFields.name = req.body.name;
+      if (req.body.price !== undefined) updateFields.price = req.body.price;
+      if (req.body.unit !== undefined) updateFields.unit = req.body.unit;
+      if (req.body.description !== undefined) updateFields.description = req.body.description;
+      if (req.body.rating !== undefined) updateFields.rating = req.body.rating;
+      if (req.body.promotion_id !== undefined) updateFields.promotion_id = req.body.promotion_id;
+      if (req.body.is_deleted !== undefined) updateFields.is_deleted = req.body.is_deleted;
+
+      const fieldNames = Object.keys(updateFields);
+      if (fieldNames.length === 0) {
+        throw new Error("No fields to update");
       }
-      if (req.body.image_url) {
-        values.push(req.body.image_url);
-        queryParams.push("image_url = ?");
-      }
-      if (req.body.is_shown !== undefined) {
-        values.push(req.body.is_shown);
-        queryParams.push("is_shown = ?");
-      }
-      if (!values.length || !queryParams.length) throw new Error("Empty Query");
-      const query = `UPDATE category SET ${queryParams.join(",")} WHERE id = ?`;
+
+      // Build query and values array
+      const setClause = fieldNames.map((field) => `${field} = ?`).join(", ");
+      const values = Object.values(updateFields);
+
+      const query = `UPDATE product SET ${setClause}, updated_at = NOW() WHERE id = ?`;
+
       await this.connection.query<[RowDataPacket[], ResultSetHeader]>(query, [...values, req.params.id]);
+
+      // Fetch and return updated product
       const [response] = await this.connection.query<RowDataPacket[]>(
-        "SELECT * from category WHERE id = ?",
+        "SELECT * FROM product WHERE id = ?",
         req.params.id,
       );
-      return response[0] as Product;
+
+      return (response[0] as Product) || null;
     } catch (error) {
       logger.error(error);
       return null;

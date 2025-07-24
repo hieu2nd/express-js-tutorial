@@ -6,12 +6,12 @@ import { CreateProductPayload, UpdateProductPayload } from "./productModel";
 import { productService } from "./productService";
 
 class ProductController {
-  public getCategories: RequestHandler = async (_req: Request, res: Response) => {
+  public getProducts: RequestHandler = async (_req: Request, res: Response) => {
     const serviceResponse = await productService.findAll();
     return handleServiceResponse(serviceResponse, res);
   };
 
-  public getCategory: RequestHandler = async (req: Request, res: Response) => {
+  public getProduct: RequestHandler = async (req: Request, res: Response) => {
     const serviceResponse = await productService.findById(req, res);
     return handleServiceResponse(serviceResponse, res);
   };
@@ -19,11 +19,11 @@ class ProductController {
     const serviceResponse = await productService.create(req);
     return handleServiceResponse(serviceResponse, res);
   };
-  public deleteCategory: RequestHandler = async (req: Request, res: Response) => {
+  public deleteProduct: RequestHandler = async (req: Request, res: Response) => {
     const serviceResponse = await productService.delete(req);
     return handleServiceResponse(serviceResponse, res);
   };
-  public updateCategory: RequestHandler = async (req: Request, res: Response) => {
+  public updateProduct: RequestHandler = async (req: Request, res: Response) => {
     const serviceResponse = await productService.update(req);
     return handleServiceResponse(serviceResponse, res);
   };

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { CreateProductSchema, GetProductSchema, ProductSchema, UpdateProductSchema } from "@/api/product/productModel";
+import { authenticateToken, optionalAuth } from "@/common/middleware/authMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { productController } from "./productController";
 
@@ -18,7 +19,9 @@ productRegistry.registerPath({
   tags: ["Product"],
   responses: createApiResponse(z.array(ProductSchema), "Success"),
 });
-productRouter.get("/", productController.getCategories);
+
+productRouter.get("/", optionalAuth, productController.getProducts);
+
 //get detail
 productRegistry.registerPath({
   method: "get",
@@ -27,8 +30,10 @@ productRegistry.registerPath({
   request: { params: GetProductSchema.shape.params },
   responses: createApiResponse(ProductSchema, "Success"),
 });
-productRouter.get("/:id", validateRequest(GetProductSchema), productController.getCategory);
+
+productRouter.get("/:id", optionalAuth, validateRequest(GetProductSchema), productController.getProduct);
 //create
+
 productRegistry.registerPath({
   method: "post",
   path: "/product",
@@ -42,7 +47,9 @@ productRegistry.registerPath({
   },
   responses: createApiResponse(ProductSchema, "Success"),
 });
-productRouter.post("/", validateRequest(CreateProductSchema), productController.createProduct);
+
+productRouter.post("/", authenticateToken, validateRequest(CreateProductSchema), productController.createProduct);
+
 //delete
 productRegistry.registerPath({
   method: "delete",
@@ -58,7 +65,9 @@ productRegistry.registerPath({
     },
   },
 });
-productRouter.delete("/:id", validateRequest(GetProductSchema), productController.deleteCategory);
+
+productRouter.delete("/:id", authenticateToken, validateRequest(GetProductSchema), productController.deleteProduct);
+
 //update
 productRegistry.registerPath({
   method: "put",
@@ -74,4 +83,5 @@ productRegistry.registerPath({
   },
   responses: createApiResponse(ProductSchema, "Success"),
 });
-productRouter.put("/:id", validateRequest(UpdateProductSchema), productController.updateCategory);
+
+productRouter.put("/:id", authenticateToken, validateRequest(UpdateProductSchema), productController.updateProduct);
