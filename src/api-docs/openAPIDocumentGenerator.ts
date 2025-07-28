@@ -1,5 +1,7 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 
+import { adminCategoryRegistry } from "@/api/admin/category/categoryRouter.admin";
+import { adminProductRegistry } from "@/api/admin/product/productRouter.admin";
 import { authRegistry } from "@/api/client/auth/authRouter";
 import { categoryRegistry } from "@/api/client/category/categoryRouter";
 import { productRegistry } from "@/api/client/product/productRouter";
@@ -13,6 +15,8 @@ export function generateOpenAPIDocument() {
     userRegistry,
     categoryRegistry,
     productRegistry,
+    adminCategoryRegistry,
+    adminProductRegistry,
   ]);
 
   // Register Bearer token security scheme

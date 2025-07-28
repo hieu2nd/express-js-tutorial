@@ -20,16 +20,19 @@ export const GetCategorySchema = z.object({
   params: z.object({ id: commonValidations.id }),
 });
 export const CreateCategorySchema = z.object({
-  body: z.object({
-    name: commonValidations.notEmptyString,
-    image_url: commonValidations.optionalString,
+  body: CategorySchema.omit({
+    id: true,
+    is_deleted: true,
   }),
 });
 export const UpdateCategorySchema = z.object({
-  body: z.object({
-    name: commonValidations.optionalString,
-    image_url: commonValidations.optionalString,
-    is_shown: commonValidations.isBinaryValue,
-  }),
+  body: CategorySchema.omit({
+    id: true,
+    is_deleted: true,
+  })
+    .partial()
+    .extend({
+      is_shown: commonValidations.isBinaryValue,
+    }),
   params: z.object({ id: commonValidations.id }),
 });

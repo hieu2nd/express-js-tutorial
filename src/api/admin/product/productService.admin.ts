@@ -1,10 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { Category, UpdateCategoryPayload } from "@/api/client/category/categoryModel";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 import type { Request, Response } from "express";
-import { CreateProductPayload, type Product, UpdateProductPayload } from "./productModel.admin";
+import type { Product } from "./productModel.admin";
 import { ProductRepository } from "./productRepository.admin";
 
 export class ProductService {
@@ -59,15 +58,11 @@ export class ProductService {
   async delete(req: Request): Promise<ServiceResponse<Record<string, never>>> {
     try {
       await this.productRepository.deleteAsync(req);
-      return ServiceResponse.success<Record<string, never>>("Category deleted", {});
+      return ServiceResponse.success<Record<string, never>>("Product deleted", {});
     } catch (ex) {
-      const errorMessage = `Error deleting category, ${(ex as Error).message}`;
+      const errorMessage = `Error deleting product, ${(ex as Error).message}`;
       logger.error(errorMessage);
-      return ServiceResponse.failure(
-        "An error occurred while finding category.",
-        {},
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
+      return ServiceResponse.failure("An error occurred while finding product.", {}, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   async update(req: Request): Promise<ServiceResponse<Product | null>> {

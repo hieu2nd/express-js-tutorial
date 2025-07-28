@@ -13,6 +13,7 @@ export const ProductSchema = z.object({
   id: commonValidations.id,
   code: commonValidations.notEmptyString,
   name: commonValidations.notEmptyString,
+  image_url: commonValidations.optionalString,
   price: z.number(),
   unit: commonValidations.notEmptyString,
   description: commonValidations.optionalString,
@@ -34,15 +35,10 @@ export const GetProductSchema = z.object({
   params: z.object({ id: commonValidations.id }),
 });
 export const UpdateProductSchema = z.object({
-  body: z.object({
-    code: commonValidations.optionalString,
-    name: commonValidations.optionalString,
-    price: z.number().optional(),
-    unit: commonValidations.optionalString,
-    description: commonValidations.optionalString,
-    rating: commonValidations.optionalNumber,
-    promotion_id: commonValidations.id.optional(),
-    is_deleted: commonValidations.isBinaryValue,
-  }),
+  body: ProductSchema.omit({
+    id: true,
+    created_at: true,
+    updated_at: true,
+  }).partial(),
   params: z.object({ id: commonValidations.id }),
 });

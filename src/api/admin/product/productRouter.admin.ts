@@ -3,46 +3,43 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import {
-  CreateProductSchema,
-  GetProductSchema,
-  ProductSchema,
-  UpdateProductSchema,
-} from "@/api/client/product/productModel";
-import { authenticateToken, optionalAuth } from "@/common/middleware/authMiddleware";
+import { authenticateToken } from "@/common/middleware/authMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { productController } from "./productController.admin";
+import { CreateProductSchema, GetProductSchema, ProductSchema, UpdateProductSchema } from "./productModel.admin";
 
-export const productRegistry = new OpenAPIRegistry();
-export const productRouter: Router = express.Router();
+export const adminProductRegistry = new OpenAPIRegistry();
+export const adminProductRouter: Router = express.Router();
 
 //get list
-productRegistry.register("Product", ProductSchema);
-productRegistry.registerPath({
+adminProductRegistry.register("Admin Product", ProductSchema);
+
+adminProductRegistry.registerPath({
   method: "get",
-  path: "/product",
-  tags: ["Product"],
+  path: "/admin/product",
+  tags: ["Admin Product"],
   responses: createApiResponse(z.array(ProductSchema), "Success"),
 });
 
-productRouter.get("/", optionalAuth, productController.getProducts);
+adminProductRouter.get("/", productController.getProducts);
 
 //get detail
-productRegistry.registerPath({
+adminProductRegistry.registerPath({
   method: "get",
-  path: "/product/{id}",
-  tags: ["Product"],
+  path: "/admin/product/{id}",
+  tags: ["Admin Product"],
   request: { params: GetProductSchema.shape.params },
   responses: createApiResponse(ProductSchema, "Success"),
 });
 
-productRouter.get("/:id", optionalAuth, validateRequest(GetProductSchema), productController.getProduct);
-//create
+adminProductRouter.get("/:id", validateRequest(GetProductSchema), productController.getProduct);
 
-productRegistry.registerPath({
+//create
+adminProductRegistry.registerPath({
   method: "post",
-  path: "/product",
-  tags: ["Product"],
+  path: "/admin/product",
+  tags: ["Admin Product"],
+  security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
@@ -53,13 +50,14 @@ productRegistry.registerPath({
   responses: createApiResponse(ProductSchema, "Success"),
 });
 
-productRouter.post("/", authenticateToken, validateRequest(CreateProductSchema), productController.createProduct);
+adminProductRouter.post("/", authenticateToken, validateRequest(CreateProductSchema), productController.createProduct);
 
 //delete
-productRegistry.registerPath({
+adminProductRegistry.registerPath({
   method: "delete",
-  path: "/product/{id}",
-  tags: ["Product"],
+  path: "/admin/product/{id}",
+  tags: ["Admin Product"],
+  security: [{ bearerAuth: [] }],
   request: { params: GetProductSchema.shape.params },
   responses: {
     200: {
@@ -71,13 +69,19 @@ productRegistry.registerPath({
   },
 });
 
-productRouter.delete("/:id", authenticateToken, validateRequest(GetProductSchema), productController.deleteProduct);
+adminProductRouter.delete(
+  "/:id",
+  authenticateToken,
+  validateRequest(GetProductSchema),
+  productController.deleteProduct,
+);
 
 //update
-productRegistry.registerPath({
+adminProductRegistry.registerPath({
   method: "put",
-  path: "/product/{id}",
-  tags: ["Product"],
+  path: "/admin/product/{id}",
+  tags: ["Admin Product"],
+  security: [{ bearerAuth: [] }],
   request: {
     params: GetProductSchema.shape.params,
     body: {
@@ -89,4 +93,9 @@ productRegistry.registerPath({
   responses: createApiResponse(ProductSchema, "Success"),
 });
 
-productRouter.put("/:id", authenticateToken, validateRequest(UpdateProductSchema), productController.updateProduct);
+adminProductRouter.put(
+  "/:id",
+  authenticateToken,
+  validateRequest(UpdateProductSchema),
+  productController.updateProduct,
+);

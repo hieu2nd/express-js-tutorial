@@ -1,10 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { Category, UpdateCategoryPayload } from "@/api/client/category/categoryModel";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 import type { Request, Response } from "express";
-import { CreateProductPayload, type Product, UpdateProductPayload } from "./productModel";
+import type { Product } from "./productModel";
 import { ProductRepository } from "./productRepository";
 
 export class ProductService {
@@ -36,50 +35,6 @@ export class ProductService {
       logger.error(errorMessage);
       return ServiceResponse.failure(
         "An error occurred while finding product.",
-        null,
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-  async create(req: Request): Promise<ServiceResponse<Product | null>> {
-    try {
-      const product = await this.productRepository.createAsync(req);
-      if (!product) return ServiceResponse.failure("Failed to create product", null, StatusCodes.BAD_REQUEST);
-      return ServiceResponse.success<Product>("Product created", product);
-    } catch (ex) {
-      const errorMessage = `Error creating product, ${(ex as Error).message}`;
-      logger.error(errorMessage);
-      return ServiceResponse.failure(
-        "An error occurred while creating product.",
-        null,
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-  async delete(req: Request): Promise<ServiceResponse<Record<string, never>>> {
-    try {
-      await this.productRepository.deleteAsync(req);
-      return ServiceResponse.success<Record<string, never>>("Category deleted", {});
-    } catch (ex) {
-      const errorMessage = `Error deleting category, ${(ex as Error).message}`;
-      logger.error(errorMessage);
-      return ServiceResponse.failure(
-        "An error occurred while finding category.",
-        {},
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-  async update(req: Request): Promise<ServiceResponse<Product | null>> {
-    try {
-      const product = await this.productRepository.updateAsync(req);
-      if (!product) return ServiceResponse.failure("Failed to update product", null, StatusCodes.BAD_REQUEST);
-      return ServiceResponse.success<Product>("Product updated", product);
-    } catch (ex) {
-      const errorMessage = `Error updating product, ${(ex as Error).message}`;
-      logger.error(errorMessage);
-      return ServiceResponse.failure(
-        "An error occurred while updating product.",
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );

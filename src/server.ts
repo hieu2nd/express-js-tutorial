@@ -10,6 +10,8 @@ import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
+import { adminCategoryRouter } from "./api/admin/category/categoryRouter.admin";
+import { adminProductRouter } from "./api/admin/product/productRouter.admin";
 import { authRouter } from "./api/client/auth/authRouter";
 import { productRouter } from "./api/client/product/productRouter";
 import { userRouter } from "./api/client/user/userRouter";
@@ -31,6 +33,8 @@ app.use("/health-check", healthCheckRouter);
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/category", categoryRouter);
+app.use("/admin/category", adminCategoryRouter);
+app.use("/admin/product", adminProductRouter);
 app.use("/product", productRouter);
 
 // Swagger UI

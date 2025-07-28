@@ -1,8 +1,6 @@
 import type { Request, RequestHandler, Response } from "express";
 
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
-import { logger } from "@/server";
-import { CreateProductPayload, UpdateProductPayload } from "./productModel.admin";
 import { productService } from "./productService.admin";
 
 interface IProductController {

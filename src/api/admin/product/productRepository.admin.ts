@@ -43,7 +43,7 @@ export class ProductRepository implements IProductRepository {
       const connection = await this.connection.getConnection();
       await connection.beginTransaction();
       const rows = await this.connection.query<[RowDataPacket[], ResultSetHeader]>(
-        "INSERT INTO product (code, name, price, unit, description, rating, created_at, updated_at, is_deleted, promotion_id) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), 0, ?)",
+        "INSERT INTO product (code, name, price, unit, description, rating, created_at, updated_at, is_deleted, is_shown, promotion_id) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), 0, 1, ?, ?)",
         [
           req.body.code,
           req.body.name,

@@ -3,47 +3,43 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import {
-  CategorySchema,
-  CreateCategorySchema,
-  GetCategorySchema,
-  UpdateCategorySchema,
-} from "@/api/client/category/categoryModel";
+import { CategorySchema } from "@/api/client/category/categoryModel";
 import { authenticateToken } from "@/common/middleware/authMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { categoryController } from "./categoryController.admin";
+import { CreateCategorySchema, GetCategorySchema, UpdateCategorySchema } from "./categoryModel.admin";
 
-export const categoryRegistry = new OpenAPIRegistry();
-export const categoryRouter: Router = express.Router();
+export const adminCategoryRegistry = new OpenAPIRegistry();
+export const adminCategoryRouter: Router = express.Router();
 
 //get list
-categoryRegistry.register("Category", CategorySchema);
+adminCategoryRegistry.register("Admin Category", CategorySchema);
 
-categoryRegistry.registerPath({
+adminCategoryRegistry.registerPath({
   method: "get",
-  path: "/category",
-  tags: ["Category"],
+  path: "/admin/category",
+  tags: ["Admin Category"],
   responses: createApiResponse(z.array(CategorySchema), "Success"),
 });
 
-categoryRouter.get("/", categoryController.getCategories);
+adminCategoryRouter.get("/", categoryController.getCategories);
 
 //get detail
-categoryRegistry.registerPath({
+adminCategoryRegistry.registerPath({
   method: "get",
-  path: "/category/{id}",
-  tags: ["Category"],
+  path: "/admin/category/{id}",
+  tags: ["Admin Category"],
   request: { params: GetCategorySchema.shape.params },
   responses: createApiResponse(CategorySchema, "Success"),
 });
 
-categoryRouter.get("/:id", validateRequest(GetCategorySchema), categoryController.getCategory);
+adminCategoryRouter.get("/:id", validateRequest(GetCategorySchema), categoryController.getCategory);
 
 //create
-categoryRegistry.registerPath({
+adminCategoryRegistry.registerPath({
   method: "post",
-  path: "/category",
-  tags: ["Category"],
+  path: "/admin/category",
+  tags: ["Admin Category"],
   security: [{ bearerAuth: [] }],
   request: {
     body: {
@@ -55,13 +51,18 @@ categoryRegistry.registerPath({
   responses: createApiResponse(CategorySchema, "Success"),
 });
 
-categoryRouter.post("/", authenticateToken, validateRequest(CreateCategorySchema), categoryController.createCategory);
+adminCategoryRouter.post(
+  "/",
+  authenticateToken,
+  validateRequest(CreateCategorySchema),
+  categoryController.createCategory,
+);
 
 //delete
-categoryRegistry.registerPath({
+adminCategoryRegistry.registerPath({
   method: "delete",
-  path: "/category/{id}",
-  tags: ["Category"],
+  path: "/admin/category/{id}",
+  tags: ["Admin Category"],
   security: [{ bearerAuth: [] }],
   request: { params: GetCategorySchema.shape.params },
   responses: {
@@ -74,13 +75,18 @@ categoryRegistry.registerPath({
   },
 });
 
-categoryRouter.delete("/:id", authenticateToken, validateRequest(GetCategorySchema), categoryController.deleteCategory);
+adminCategoryRouter.delete(
+  "/:id",
+  authenticateToken,
+  validateRequest(GetCategorySchema),
+  categoryController.deleteCategory,
+);
 
 //update
-categoryRegistry.registerPath({
+adminCategoryRegistry.registerPath({
   method: "put",
-  path: "/category/{id}",
-  tags: ["Category"],
+  path: "/admin/category/{id}",
+  tags: ["Admin Category"],
   security: [{ bearerAuth: [] }],
   request: {
     params: GetCategorySchema.shape.params,
@@ -93,4 +99,9 @@ categoryRegistry.registerPath({
   responses: createApiResponse(CategorySchema, "Success"),
 });
 
-categoryRouter.put("/:id", authenticateToken, validateRequest(UpdateCategorySchema), categoryController.updateCategory);
+adminCategoryRouter.put(
+  "/:id",
+  authenticateToken,
+  validateRequest(UpdateCategorySchema),
+  categoryController.updateCategory,
+);
