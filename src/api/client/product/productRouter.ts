@@ -11,11 +11,11 @@ export const productRegistry = new OpenAPIRegistry();
 export const productRouter: Router = express.Router();
 
 //get list
-productRegistry.register("Product", ProductSchema);
+productRegistry.register("Client Product", ProductSchema);
 productRegistry.registerPath({
   method: "get",
   path: "/product",
-  tags: ["Product"],
+  tags: ["Client Product"],
   responses: createApiResponse(z.array(ProductSchema), "Success"),
 });
 
@@ -25,7 +25,7 @@ productRouter.get("/", optionalAuth, productController.getProducts);
 productRegistry.registerPath({
   method: "get",
   path: "/product/{id}",
-  tags: ["Product"],
+  tags: ["Client Product"],
   request: { params: GetProductSchema.shape.params },
   responses: createApiResponse(ProductSchema, "Success"),
 });
