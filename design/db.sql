@@ -44,6 +44,7 @@ CREATE TABLE `product` (
   `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `code` varchar(255) UNIQUE,
   `name` varchar(255),
+  `image_url` varchar(255),
   `price` decimal,
   `unit` varchar(255),
   `description` varchar(255),
@@ -51,6 +52,7 @@ CREATE TABLE `product` (
   `created_at` timestamp,
   `updated_at` timestamp,
   `is_deleted` bool,
+  `is_shown` bool,
   `promotion_id` int(11)
 );
 
