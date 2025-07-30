@@ -22,7 +22,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE `employee` (
   `id` int(11) PRIMARY KEY NOT NULL,
-  `code` varchar(255) UNIQUE,
+  `code` varchar(255) UNIQUE NOT NULL,
   `store_id` int(11)
 );
 
@@ -122,7 +122,7 @@ CREATE TABLE `store` (
   `name` varchar(255),
   `is_deleted` bool,
   `phone_number` varchar(255),
-  `address_id` int(11)
+  `address` varchar(255)
 );
 
 CREATE TABLE `shipment` (
