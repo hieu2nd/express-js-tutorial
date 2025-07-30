@@ -6,8 +6,8 @@ import { commonValidations } from "@/common/utils/commonValidation";
 extendZodWithOpenApi(z);
 
 export type User = z.infer<typeof UserSchema>;
-export type Customer = z.infer<typeof CustomerSchema>;
 export type Employee = z.infer<typeof EmployeeSchema>;
+export type EmployeeResponse = z.infer<typeof EmployeeResponseSchema>;
 
 export const UserSchema = z
   .object({
@@ -25,20 +25,26 @@ export const UserSchema = z
     is_active: commonValidations.isBinaryValue,
     password: z.string(),
     username: z.string(),
-  });
-
-// Customer inherits from User and adds customer-specific fields
-export const CustomerSchema = UserSchema.extend({
-  username: z.string(),
-  status: z.string(),
-  is_active: commonValidations.isBinaryValue,
-});
+  })
+  .openapi("User");
 
 // Employee inherits from User and adds employee-specific fields
 export const EmployeeSchema = UserSchema.extend({
   code: z.string(),
-  store_id: z.number(),
-});
+  store: z.object({
+    store_id: z.number(),
+    code: z.string(),
+    phone_number: z.string(),
+    address: z.string(),
+  }),
+}).openapi("Employee");
+
+// EmployeeResponse - Safe for API responses (password excluded)
+export const EmployeeResponseSchema = EmployeeSchema.omit({
+  password: true, // ← Password is NOT included in API responses
+  updated_at: true, // ← Internal timestamps excluded
+  created_at: true, // ← Internal timestamps excluded
+}).openapi("EmployeeResponse");
 
 // Input Validation for 'GET users/:id' endpoint
 export const GetUserSchema = z.object({

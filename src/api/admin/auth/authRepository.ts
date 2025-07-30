@@ -1,13 +1,14 @@
-import type { CustomerAccountRequest } from "@/api/auth/authModel";
 import Database from "@/database";
 import bcrypt from "bcryptjs";
 import type { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import type { Customer, User } from "../user/userModel";
+import type { Employee } from "../user/userModel";
+import { type EmployeeAccountRequest, type EmployeeQueryRow, EmployeeQueryRowSchema } from "./authModel";
+
 export interface IAuthRepository {
-  findByUsernameAsync(username: string): Promise<User | null>;
-  findByIdAsync(id: number): Promise<Customer | null>;
-  createCustomerAccountAsync(registerData: CustomerAccountRequest): Promise<Customer>;
-  updateAccountAsync(id: number, accountData: Partial<CustomerAccountRequest>): Promise<CustomerAccountRequest | null>;
+  findByUsernameAsync(username: string): Promise<EmployeeQueryRow | null>;
+  findByIdAsync(id: number): Promise<Employee | null>;
+  createEmployeeAccountAsync(registerData: EmployeeAccountRequest): Promise<EmployeeQueryRow>;
+  updateAccountAsync(id: number, accountData: Partial<EmployeeAccountRequest>): Promise<EmployeeQueryRow | null>;
 }
 
 class AuthRepository implements IAuthRepository {
@@ -15,43 +16,58 @@ class AuthRepository implements IAuthRepository {
   constructor() {
     this.connection = Database.getInstance().getConnection();
   }
-  async findByUsernameAsync(username: string): Promise<User | null> {
-    // TODO: Implement database query to find account by username
-    // Example using your database connection:
-    // const query = 'SELECT * FROM account WHERE username = ? AND is_deleted = 0';
-    // const [rows] = await db.execute(query, [username]);
-    // return rows.length > 0 ? rows[0] as Account : null;
-
-    const query = "SELECT a.*, u.* FROM account a JOIN user u ON a.id = u.id WHERE a.username = ? AND a.is_deleted = 0";
+  async findByUsernameAsync(username: string): Promise<EmployeeQueryRow | null> {
+    const query =
+      "SELECT a.*, u.*, e.*, s.code as store_code, s.name as store_name, s.phone_number as store_phone_number, s.address as store_address, s.is_deleted as store_is_deleted FROM account a JOIN user u ON a.id = u.id JOIN employee e ON u.id = e.id JOIN store s ON e.store_id = s.id WHERE a.username = ? AND a.is_deleted = 0";
     const [rows] = await this.connection.query<RowDataPacket[]>(query, [username]);
-    return rows.length > 0 ? (rows[0] as User) : null;
+
+    if (rows.length > 0) {
+      const row = rows[0] as EmployeeQueryRow;
+
+      const validatedRow = EmployeeQueryRowSchema.parse(row) as EmployeeQueryRow;
+
+      return validatedRow;
+    }
+    return null;
   }
 
-  async findByIdAsync(id: number): Promise<Customer | null> {
-    // TODO: Implement database query to find account by id
-    // Example using your database connection:
-    // const query = 'SELECT * FROM account WHERE id = ? AND is_deleted = 0';
-    // const [rows] = await db.execute(query, [id]);
-    // return rows.length > 0 ? rows[0] as Account : null;
-    const query = "SELECT * FROM account WHERE id = ? AND is_deleted = 0";
+  async findByIdAsync(id: number): Promise<Employee | null> {
+    const query =
+      "SELECT a.*, u.*, e.code, e.store_id, s.code as store_code, s.name as store_name, s.phone_number as store_phone_number, s.address as store_address, s.is_deleted as store_is_deleted FROM account a JOIN user u ON a.id = u.id JOIN employee e ON u.id = e.id JOIN store s ON e.store_id = s.id WHERE a.id = ? AND a.is_deleted = 0";
     const [rows] = await this.connection.query<RowDataPacket[]>(query, [id]);
-    return rows.length > 0 ? (rows[0] as Customer) : null;
+
+    if (rows.length > 0) {
+      const row = rows[0] as EmployeeQueryRow;
+
+      const validatedRow = EmployeeQueryRowSchema.parse(row);
+
+      const employee: Employee = {
+        id: validatedRow.id,
+        username: validatedRow.username,
+        full_name: validatedRow.full_name,
+        email: validatedRow.email,
+        phone_number: validatedRow.phone_number,
+        address: validatedRow.address,
+        is_deleted: validatedRow.is_deleted as 0 | 1,
+        dob: validatedRow.dob || undefined,
+        updated_at: validatedRow.updated_at,
+        created_at: validatedRow.created_at,
+        is_active: validatedRow.is_active as 0 | 1,
+        password: validatedRow.password,
+        code: validatedRow.code,
+        store: {
+          store_id: validatedRow.store_id,
+          code: validatedRow.store_code,
+          phone_number: validatedRow.store_phone_number,
+          address: validatedRow.store_address,
+        },
+      };
+      return employee;
+    }
+    return null;
   }
 
-  async createCustomerAccountAsync(registerData: CustomerAccountRequest): Promise<Customer> {
-    // TODO: Implement database insert for new account
-    // Example using your database connection:
-    // const query = `
-    //   INSERT INTO account (username, password, is_active, created_at, updated_at, is_deleted)
-    //   VALUES (?, ?, 1, NOW(), NOW(), 0)
-    // `;
-    // const [result] = await db.execute(query, [
-    //   accountData.username,
-    //   accountData.password
-    // ]);
-    // return this.findByIdAsync(result.insertId);
-
-    // Temporary mock implementation
+  async createEmployeeAccountAsync(registerData: EmployeeAccountRequest): Promise<EmployeeQueryRow> {
     let connection: PoolConnection | undefined;
     try {
       connection = await this.connection.getConnection();
@@ -74,13 +90,21 @@ class AuthRepository implements IAuthRepository {
           registerData.body.dob,
         ],
       );
-      await this.connection.query("INSERT INTO customer (id,created_at) VALUES (?, NOW())", [insertId]);
+      await this.connection.query("INSERT INTO employee (id,code,store_id) VALUES (?,?,?)", [
+        insertId,
+        registerData.body.code,
+        registerData.body.store_id,
+      ]);
       const [response] = await this.connection.query<RowDataPacket[]>(
-        "SELECT a.username, u.*, c.status FROM account a JOIN user u ON a.id = u.id JOIN customer c ON u.id = c.id WHERE u.id = ?",
+        "SELECT a.username, u.*, e.code, e.store_id, s.code as store_code, s.name as store_name, s.phone_number as store_phone_number, s.address as store_address, s.is_deleted as store_is_deleted FROM account a JOIN user u ON a.id = u.id JOIN employee e ON u.id = e.id JOIN store s ON e.store_id = s.id WHERE u.id = ?",
         [insertId],
       );
+      console.log("createEmployeeAccountAsync response:", response[0]);
+
+      // Transform the flat result into the expected Employee structure without password
+      const row = response[0] as EmployeeQueryRow;
       await connection.commit();
-      return response[0] as Customer;
+      return row;
     } catch (error) {
       if (connection) {
         await connection.rollback();
@@ -93,10 +117,7 @@ class AuthRepository implements IAuthRepository {
     }
   }
 
-  async updateAccountAsync(
-    id: number,
-    accountData: Partial<CustomerAccountRequest>,
-  ): Promise<CustomerAccountRequest | null> {
+  async updateAccountAsync(id: number, accountData: Partial<EmployeeAccountRequest>): Promise<EmployeeQueryRow | null> {
     // TODO: Implement database update for account
     // Example using your database connection:
     // const query = `

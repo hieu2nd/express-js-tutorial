@@ -3,109 +3,92 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { validateRequest } from "@/common/utils/httpHandlers";
-import { authController } from "./authController";
-import { CustomerAccountSchema, LoginRequestSchema, RefreshTokenSchema } from "./authModel";
+import { validateBody, validateSchema } from "@/common/utils/httpHandlers";
+import { adminAuthController } from "./authController";
+import {
+  EmployeeRegistrationRequestBodySchema,
+  LoginRequestBodySchema,
+  LoginResponseSchema,
+  RefreshTokenRequestBodySchema,
+  RefreshTokenResponseSchema,
+  ValidateAuthHeaderSchema,
+  VerifyTokenResponseSchema,
+} from "./authModel";
 
-export const authRegistry = new OpenAPIRegistry();
-export const authRouter: Router = express.Router();
+export const adminAuthRegistry = new OpenAPIRegistry();
+export const adminAuthRouter: Router = express.Router();
 
-authRegistry.register("Auth", z.object({}));
+adminAuthRegistry.register("Admin Auth", z.object({}));
 
-authRegistry.registerPath({
+adminAuthRegistry.registerPath({
   method: "post",
-  path: "/auth/login",
-  tags: ["Auth"],
+  path: "admin/auth/login",
+  tags: ["Admin Auth"],
   request: {
     body: {
       content: {
         "application/json": {
-          schema: LoginRequestSchema.shape.body,
+          schema: LoginRequestBodySchema,
         },
       },
     },
   },
-  responses: createApiResponse(
-    z.object({
-      token: z.string(),
-      user: z.object({
-        id: z.number(),
-        username: z.string(),
-        full_name: z.string(),
-        email: z.string(),
-      }),
-    }),
-    "Login successful",
-  ),
+  responses: createApiResponse(LoginResponseSchema, "Login successful"),
 });
 
-authRegistry.registerPath({
+adminAuthRegistry.registerPath({
   method: "post",
-  path: "/auth/register",
-  tags: ["Auth"],
+  path: "/admin/auth/register",
+  tags: ["Admin Auth"],
   request: {
     body: {
       content: {
         "application/json": {
-          schema: CustomerAccountSchema.shape.body,
+          schema: EmployeeRegistrationRequestBodySchema,
         },
       },
     },
   },
-  responses: createApiResponse(
-    z.object({
-      token: z.string(),
-      user: z.object({
-        id: z.number(),
-        username: z.string(),
-        full_name: z.string(),
-        email: z.string(),
-      }),
-    }),
-    "Registration successful",
-  ),
+  responses: createApiResponse(LoginResponseSchema, "Registration successful"),
 });
 
-authRegistry.registerPath({
+adminAuthRegistry.registerPath({
   method: "post",
   path: "/auth/refresh",
-  tags: ["Auth"],
+  tags: ["Admin Auth"],
   request: {
     body: {
       content: {
         "application/json": {
-          schema: RefreshTokenSchema.shape.body,
+          schema: RefreshTokenRequestBodySchema,
         },
       },
     },
   },
-  responses: createApiResponse(
-    z.object({
-      accessToken: z.string(),
-    }),
-    "Token refreshed successfully",
-  ),
+  responses: createApiResponse(RefreshTokenResponseSchema, "Token refreshed successfully"),
 });
 
-authRegistry.registerPath({
+adminAuthRegistry.registerPath({
   method: "post",
   path: "/auth/verify",
-  tags: ["Auth"],
+  tags: ["Admin Auth"],
   request: {
     headers: z.object({
       authorization: z.string(),
     }),
   },
-  responses: createApiResponse(
-    z.object({
-      userId: z.number(),
-      username: z.string(),
-    }),
-    "Token verified successfully",
-  ),
+  responses: createApiResponse(VerifyTokenResponseSchema, "Token verified successfully"),
 });
 
-authRouter.post("/login", validateRequest(LoginRequestSchema), authController.login);
-authRouter.post("/register", validateRequest(CustomerAccountSchema), authController.registerCustomer);
-authRouter.post("/refresh", validateRequest(RefreshTokenSchema), authController.refreshToken);
-authRouter.post("/verify", authController.verifyToken);
+// Routes with enhanced validation
+adminAuthRouter.post("/login", validateBody(LoginRequestBodySchema), adminAuthController.login);
+
+adminAuthRouter.post(
+  "/register",
+  validateBody(EmployeeRegistrationRequestBodySchema),
+  adminAuthController.registerEmployee,
+);
+
+adminAuthRouter.post("/refresh", validateBody(RefreshTokenRequestBodySchema), adminAuthController.refreshToken);
+
+adminAuthRouter.post("/verify", validateSchema(ValidateAuthHeaderSchema), adminAuthController.verifyToken);

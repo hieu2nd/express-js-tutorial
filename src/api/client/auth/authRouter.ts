@@ -5,7 +5,14 @@ import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { authController } from "./authController";
-import { CustomerAccountSchema, LoginRequestSchema, RefreshTokenSchema } from "./authModel";
+import {
+  CustomerAccountRequestSchema,
+  LoginRequestSchema,
+  LoginResponseSchema,
+  RefreshTokenRequestBodySchema,
+  RefreshTokenResponseSchema,
+  VerifyTokenResponseSchema,
+} from "./authModel";
 
 export const authRegistry = new OpenAPIRegistry();
 export const authRouter: Router = express.Router();
@@ -25,18 +32,7 @@ authRegistry.registerPath({
       },
     },
   },
-  responses: createApiResponse(
-    z.object({
-      token: z.string(),
-      user: z.object({
-        id: z.number(),
-        username: z.string(),
-        full_name: z.string(),
-        email: z.string(),
-      }),
-    }),
-    "Login successful",
-  ),
+  responses: createApiResponse(LoginResponseSchema, "Login successful"),
 });
 
 authRegistry.registerPath({
@@ -47,23 +43,12 @@ authRegistry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: CustomerAccountSchema.shape.body,
+          schema: CustomerAccountRequestSchema.shape.body,
         },
       },
     },
   },
-  responses: createApiResponse(
-    z.object({
-      token: z.string(),
-      user: z.object({
-        id: z.number(),
-        username: z.string(),
-        full_name: z.string(),
-        email: z.string(),
-      }),
-    }),
-    "Registration successful",
-  ),
+  responses: createApiResponse(LoginResponseSchema, "Registration successful"),
 });
 
 authRegistry.registerPath({
@@ -74,17 +59,12 @@ authRegistry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: RefreshTokenSchema.shape.body,
+          schema: RefreshTokenRequestBodySchema,
         },
       },
     },
   },
-  responses: createApiResponse(
-    z.object({
-      accessToken: z.string(),
-    }),
-    "Token refreshed successfully",
-  ),
+  responses: createApiResponse(RefreshTokenResponseSchema, "Token refreshed successfully"),
 });
 
 authRegistry.registerPath({
@@ -96,16 +76,14 @@ authRegistry.registerPath({
       authorization: z.string(),
     }),
   },
-  responses: createApiResponse(
-    z.object({
-      userId: z.number(),
-      username: z.string(),
-    }),
-    "Token verified successfully",
-  ),
+  responses: createApiResponse(VerifyTokenResponseSchema, "Token verified successfully"),
 });
 
 authRouter.post("/login", validateRequest(LoginRequestSchema), authController.login);
-authRouter.post("/register", validateRequest(CustomerAccountSchema), authController.registerCustomer);
-authRouter.post("/refresh", validateRequest(RefreshTokenSchema), authController.refreshToken);
+authRouter.post("/register", validateRequest(CustomerAccountRequestSchema), authController.registerCustomer);
+authRouter.post(
+  "/refresh",
+  validateRequest(z.object({ body: RefreshTokenRequestBodySchema })),
+  authController.refreshToken,
+);
 authRouter.post("/verify", authController.verifyToken);
