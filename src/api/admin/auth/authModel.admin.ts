@@ -5,6 +5,16 @@ import { z } from "zod";
 extendZodWithOpenApi(z);
 
 // =============================================================================
+// ROLE ENUM
+// =============================================================================
+
+export enum ROLES {
+  ADMIN = 1,
+  EMPLOYEE = 2,
+  CUSTOMER = 3,
+}
+
+// =============================================================================
 // EXTENDED SCHEMAS FOR JOINED QUERIES
 // =============================================================================
 
@@ -45,6 +55,7 @@ export const EmployeeQueryRowSchema = z
     store_phone_number: z.string(),
     store_address: z.string(),
     store_is_deleted: z.number(),
+    role_id: z.number(),
   })
   .openapi("EmployeeQueryRow");
 
@@ -146,6 +157,7 @@ export const VerifyTokenResponseSchema = z
     username: z.string(),
     iat: z.number().optional(),
     exp: z.number().optional(),
+    role_id: z.number(),
   })
   .openapi("AuthServiceVerifyTokenResponse");
 
@@ -163,6 +175,7 @@ export const JwtPayloadSchema = z
   .object({
     userId: z.number(),
     username: z.string(),
+    role_id: z.number(),
     iat: z.number().optional(),
     exp: z.number().optional(),
   })

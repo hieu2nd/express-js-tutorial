@@ -5,13 +5,13 @@ import { env } from "@/common/utils/envConfig";
 import { logger } from "@/server";
 import bcrypt from "bcryptjs";
 import jwt, { type SignOptions } from "jsonwebtoken";
-import type {
-  CustomerRegistrationRequestBody,
-  JwtPayload,
-  LoginRequest,
-  LoginResponse,
-  RefreshTokenResponse,
-  VerifyTokenResponse,
+import {
+  type CustomerAccountRequest,
+  CustomerRegistrationRequestBodySchema,
+  type JwtPayload,
+  type LoginRequest,
+  type LoginResponse,
+  type VerifyTokenResponse,
 } from "./authModel";
 import { authRepository } from "./authRepository";
 export class AuthService {
@@ -63,14 +63,14 @@ export class AuthService {
     }
   }
 
-  async registerCustomer(
-    registerData: CustomerRegistrationRequestBody,
-  ): Promise<ServiceResponse<LoginResponse | null>> {
+  async register(registerData: CustomerAccountRequest): Promise<ServiceResponse<LoginResponse | null>> {
     try {
-      const foundUser = await authRepository.findByUsernameAsync(registerData.username);
+      const validatedData = CustomerRegistrationRequestBodySchema.parse(registerData.body);
+
+      const foundUser = await authRepository.findByUsernameAsync(validatedData.username);
       if (foundUser) return ServiceResponse.failure("Username already exists", null, StatusCodes.CONFLICT);
 
-      const registeredAccount = await authRepository.createCustomerAccountAsync(registerData);
+      const registeredAccount = await authRepository.createCustomerAccountAsync(validatedData);
       const accessToken = this.generateAccessToken({
         userId: registeredAccount.id,
         username: registeredAccount.username,

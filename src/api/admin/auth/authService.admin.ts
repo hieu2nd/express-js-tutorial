@@ -12,9 +12,9 @@ import type {
   LoginResponse,
   RefreshTokenResponse,
   VerifyTokenResponse,
-} from "./authModel";
-import { EmployeeRegistrationRequestBodySchema, LoginRequestBodySchema } from "./authModel";
-import { authRepository } from "./authRepository";
+} from "./authModel.admin";
+import { EmployeeRegistrationRequestBodySchema, LoginRequestBodySchema } from "./authModel.admin";
+import { authRepository } from "./authRepository.admin";
 export class AdminAuthService {
   private readonly JWT_SECRET: string = env.JWT_SECRET;
   private readonly JWT_EXPIRES_IN: string | number = env.JWT_EXPIRES_IN;
@@ -41,6 +41,7 @@ export class AdminAuthService {
       const accessToken = this.generateAccessToken({
         userId: foundUser.id,
         username: foundUser.username,
+        role_id: foundUser.role_id,
       });
 
       const response: LoginResponse = {
@@ -70,7 +71,7 @@ export class AdminAuthService {
     }
   }
 
-  async registerEmployee(registerData: EmployeeAccountRequest): Promise<ServiceResponse<LoginResponse | null>> {
+  async register(registerData: EmployeeAccountRequest): Promise<ServiceResponse<LoginResponse | null>> {
     try {
       // Validate input data
       const validatedData = EmployeeRegistrationRequestBodySchema.parse(registerData.body);
@@ -85,6 +86,7 @@ export class AdminAuthService {
       const accessToken = this.generateAccessToken({
         userId: registeredAccount.id,
         username: registeredAccount.username,
+        role_id: registeredAccount.role_id,
       });
 
       const response: LoginResponse = {
@@ -117,7 +119,7 @@ export class AdminAuthService {
   async verifyToken(token: string): Promise<ServiceResponse<VerifyTokenResponse | null>> {
     try {
       const decoded = jwt.verify(token, this.JWT_SECRET) as JwtPayload;
-      const user = await authRepository.findByIdAsync(decoded.userId);
+      const user = await authRepository.findByUsernameAsync(decoded.username);
 
       if (!user) {
         return ServiceResponse.failure("User not found", null, StatusCodes.UNAUTHORIZED);
@@ -132,6 +134,7 @@ export class AdminAuthService {
         username: user.username,
         iat: decoded.iat,
         exp: decoded.exp,
+        role_id: user.role_id,
       };
 
       return ServiceResponse.success("Token is valid", response, StatusCodes.OK);
@@ -161,6 +164,7 @@ export class AdminAuthService {
       const newAccessToken = this.generateAccessToken({
         userId: user.id,
         username: user.username,
+        role_id: user.role_id,
       });
 
       const response: RefreshTokenResponse = {

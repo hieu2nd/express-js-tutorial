@@ -16,11 +16,17 @@
     "lint:fix": "biome check src/ --fix",
     "format": "biome format src/",
     "test": "vitest run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrate:up": "tsx src/cli/migrate.ts up",
+    "migrate:down": "tsx src/cli/migrate.ts down",
+    "migrate:status": "tsx src/cli/migrate.ts status",
+    "migrate:rollback": "tsx src/cli/migrate.ts rollback",
+    "migrate:create": "tsx src/cli/migrate.ts create"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.0.0",
     "bcryptjs": "^3.0.2",
+    "commander": "^14.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "envalid": "^8.0.0",

@@ -2,10 +2,21 @@ CREATE TABLE `account` (
   `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `username` varchar(255),
   `password` varchar(255),
+  `role_id` int(11),
   `is_active` integer,
   `created_at` timestamp,
   `updated_at` timestamp,
   `is_deleted` bool
+);
+
+CREATE TABLE `role` (
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL UNIQUE,
+  `description` text,
+  `permissions` json,
+  `is_active` bool DEFAULT true,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `user` (
@@ -173,3 +184,5 @@ ALTER TABLE `order_history` ADD FOREIGN KEY (`order_id`) REFERENCES `order` (`id
 ALTER TABLE `employee` ADD FOREIGN KEY (`store_id`) REFERENCES `store` (`id`);
 
 ALTER TABLE `order` ADD FOREIGN KEY (`shipment_id`) REFERENCES `shipment` (`id`);
+
+ALTER TABLE `account` ADD FOREIGN KEY (`role_id`) REFERENCES `role` (`id`);

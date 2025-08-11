@@ -51,36 +51,8 @@ authRegistry.registerPath({
   responses: createApiResponse(LoginResponseSchema, "Registration successful"),
 });
 
-authRegistry.registerPath({
-  method: "post",
-  path: "/auth/refresh",
-  tags: ["Auth"],
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: RefreshTokenRequestBodySchema,
-        },
-      },
-    },
-  },
-  responses: createApiResponse(RefreshTokenResponseSchema, "Token refreshed successfully"),
-});
-
-authRegistry.registerPath({
-  method: "post",
-  path: "/auth/verify",
-  tags: ["Auth"],
-  request: {
-    headers: z.object({
-      authorization: z.string(),
-    }),
-  },
-  responses: createApiResponse(VerifyTokenResponseSchema, "Token verified successfully"),
-});
-
 authRouter.post("/login", validateRequest(LoginRequestSchema), authController.login);
-authRouter.post("/register", validateRequest(CustomerAccountRequestSchema), authController.registerCustomer);
+authRouter.post("/register", validateRequest(CustomerAccountRequestSchema), authController.register);
 authRouter.post(
   "/refresh",
   validateRequest(z.object({ body: RefreshTokenRequestBodySchema })),
