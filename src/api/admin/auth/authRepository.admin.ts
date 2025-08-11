@@ -2,11 +2,11 @@ import Database from "@/database";
 import bcrypt from "bcryptjs";
 import type { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import type { Employee } from "../user/userModel";
-import { type EmployeeAccountRequest, type EmployeeQueryRow, EmployeeQueryRowSchema } from "./authModel";
+import { type EmployeeAccountRequest, type EmployeeQueryRow, EmployeeQueryRowSchema } from "./authModel.admin";
 
 export interface IAuthRepository {
   findByUsernameAsync(username: string): Promise<EmployeeQueryRow | null>;
-  findByIdAsync(id: number): Promise<Employee | null>;
+  findByIdAsync(id: number): Promise<EmployeeQueryRow | null>;
   createEmployeeAccountAsync(registerData: EmployeeAccountRequest): Promise<EmployeeQueryRow>;
   updateAccountAsync(id: number, accountData: Partial<EmployeeAccountRequest>): Promise<EmployeeQueryRow | null>;
 }
@@ -31,7 +31,7 @@ class AuthRepository implements IAuthRepository {
     return null;
   }
 
-  async findByIdAsync(id: number): Promise<Employee | null> {
+  async findByIdAsync(id: number): Promise<EmployeeQueryRow | null> {
     const query =
       "SELECT a.*, u.*, e.code, e.store_id, s.code as store_code, s.name as store_name, s.phone_number as store_phone_number, s.address as store_address, s.is_deleted as store_is_deleted FROM account a JOIN user u ON a.id = u.id JOIN employee e ON u.id = e.id JOIN store s ON e.store_id = s.id WHERE a.id = ? AND a.is_deleted = 0";
     const [rows] = await this.connection.query<RowDataPacket[]>(query, [id]);
@@ -40,29 +40,7 @@ class AuthRepository implements IAuthRepository {
       const row = rows[0] as EmployeeQueryRow;
 
       const validatedRow = EmployeeQueryRowSchema.parse(row);
-
-      const employee: Employee = {
-        id: validatedRow.id,
-        username: validatedRow.username,
-        full_name: validatedRow.full_name,
-        email: validatedRow.email,
-        phone_number: validatedRow.phone_number,
-        address: validatedRow.address,
-        is_deleted: validatedRow.is_deleted as 0 | 1,
-        dob: validatedRow.dob || undefined,
-        updated_at: validatedRow.updated_at,
-        created_at: validatedRow.created_at,
-        is_active: validatedRow.is_active as 0 | 1,
-        password: validatedRow.password,
-        code: validatedRow.code,
-        store: {
-          store_id: validatedRow.store_id,
-          code: validatedRow.store_code,
-          phone_number: validatedRow.store_phone_number,
-          address: validatedRow.store_address,
-        },
-      };
-      return employee;
+      return validatedRow;
     }
     return null;
   }
@@ -75,7 +53,7 @@ class AuthRepository implements IAuthRepository {
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash(registerData.body.password, salt);
       const rows = await this.connection.query<[RowDataPacket[], ResultSetHeader]>(
-        "INSERT INTO account (username,password,is_active,created_at,updated_at,is_deleted) VALUES (?, ?, 1, NOW(), NOW(), 0)",
+        "INSERT INTO account (username,password,role_id,is_active,created_at,updated_at,is_deleted) VALUES (?, ?, 2, 1, NOW(), NOW(), 0)",
         [registerData.body.username, hashedPassword],
       );
       const insertId = (rows[0] as RowDataPacket).insertId;
@@ -99,7 +77,6 @@ class AuthRepository implements IAuthRepository {
         "SELECT a.username, u.*, e.code, e.store_id, s.code as store_code, s.name as store_name, s.phone_number as store_phone_number, s.address as store_address, s.is_deleted as store_is_deleted FROM account a JOIN user u ON a.id = u.id JOIN employee e ON u.id = e.id JOIN store s ON e.store_id = s.id WHERE u.id = ?",
         [insertId],
       );
-      console.log("createEmployeeAccountAsync response:", response[0]);
 
       // Transform the flat result into the expected Employee structure without password
       const row = response[0] as EmployeeQueryRow;

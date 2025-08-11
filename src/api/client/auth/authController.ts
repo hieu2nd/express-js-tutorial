@@ -1,11 +1,12 @@
 import type { Request, RequestHandler, Response } from "express";
 
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
+import { type CustomerAccountRequest, CustomerRegistrationRequestBody } from "./authModel";
 import { authService } from "./authService";
 
 interface IAuthController {
   login: RequestHandler;
-  registerCustomer: RequestHandler;
+  register: RequestHandler;
   refreshToken: RequestHandler;
   verifyToken: RequestHandler;
 }
@@ -16,8 +17,9 @@ class AuthController implements IAuthController {
     return handleServiceResponse(serviceResponse, res);
   };
 
-  public registerCustomer: RequestHandler = async (req: Request, res: Response) => {
-    const serviceResponse = await authService.registerCustomer(req);
+  public register: RequestHandler = async (req: Request, res: Response) => {
+    const registerRequest: CustomerAccountRequest = req as CustomerAccountRequest; // Assuming the request body is validated by middleware
+    const serviceResponse = await authService.register(registerRequest);
     return handleServiceResponse(serviceResponse, res);
   };
 

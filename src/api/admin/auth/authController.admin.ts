@@ -1,12 +1,12 @@
 import type { Request, RequestHandler, Response } from "express";
 
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
-import type { EmployeeAccountRequest, LoginRequest, RefreshTokenRequestBody } from "./authModel";
-import { adminAuthService } from "./authService";
+import type { EmployeeAccountRequest, LoginRequest, RefreshTokenRequestBody } from "./authModel.admin";
+import { adminAuthService } from "./authService.admin";
 
 interface IAuthController {
   login: RequestHandler;
-  registerEmployee: RequestHandler;
+  register: RequestHandler;
   refreshToken: RequestHandler;
   verifyToken: RequestHandler;
 }
@@ -19,10 +19,10 @@ class AuthController implements IAuthController {
     return handleServiceResponse(serviceResponse, res);
   };
 
-  public registerEmployee: RequestHandler = async (req: Request, res: Response) => {
+  public register: RequestHandler = async (req: Request, res: Response) => {
     // The request body is already validated by middleware
     const registerRequest: EmployeeAccountRequest = req as EmployeeAccountRequest;
-    const serviceResponse = await adminAuthService.registerEmployee(registerRequest);
+    const serviceResponse = await adminAuthService.register(registerRequest);
     return handleServiceResponse(serviceResponse, res);
   };
 

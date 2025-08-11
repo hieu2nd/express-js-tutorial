@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { CategorySchema } from "@/api/client/category/categoryModel";
-import { authenticateToken } from "@/common/middleware/authMiddleware";
+import { authenticateAdminToken } from "@/common/middleware/adminAuthMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { categoryController } from "./categoryController.admin";
 import { CreateCategorySchema, GetCategorySchema, UpdateCategorySchema } from "./categoryModel.admin";
@@ -53,7 +53,7 @@ adminCategoryRegistry.registerPath({
 
 adminCategoryRouter.post(
   "/",
-  authenticateToken,
+  authenticateAdminToken,
   validateRequest(CreateCategorySchema),
   categoryController.createCategory,
 );
@@ -77,7 +77,7 @@ adminCategoryRegistry.registerPath({
 
 adminCategoryRouter.delete(
   "/:id",
-  authenticateToken,
+  authenticateAdminToken,
   validateRequest(GetCategorySchema),
   categoryController.deleteCategory,
 );
@@ -101,7 +101,7 @@ adminCategoryRegistry.registerPath({
 
 adminCategoryRouter.put(
   "/:id",
-  authenticateToken,
+  authenticateAdminToken,
   validateRequest(UpdateCategorySchema),
   categoryController.updateCategory,
 );

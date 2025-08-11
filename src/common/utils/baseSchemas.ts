@@ -17,6 +17,7 @@ export const AccountSchema = z.object({
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
   is_deleted: z.boolean().default(false),
+  role_id: z.number(),
 });
 
 // User Schema
@@ -26,7 +27,7 @@ export const UserSchema = z.object({
   phone_number: z.string().max(255).optional(),
   email: z.string().email().max(255).optional(),
   address: z.string().max(255).optional(),
-  dob: z.date().optional(),
+  dob: z.coerce.date().optional(),
   is_deleted: z.boolean().default(false),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -140,6 +141,17 @@ export const ShipmentSchema = z.object({
   store_id: z.number().int().positive().optional(),
 });
 
+// Role Schema
+export const RoleSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1).max(255),
+  description: z.string().optional(),
+  permissions: z.record(z.any()).optional(), // JSON field for permissions
+  is_active: z.number().int().min(0).max(1).default(1), // TINYINT(1) for boolean
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+
 // Type exports for TypeScript usage
 export type Account = z.infer<typeof AccountSchema>;
 export type User = z.infer<typeof UserSchema>;
@@ -153,3 +165,4 @@ export type OrderHistory = z.infer<typeof OrderHistorySchema>;
 export type Promotion = z.infer<typeof PromotionSchema>;
 export type Store = z.infer<typeof StoreSchema>;
 export type Shipment = z.infer<typeof ShipmentSchema>;
+export type Role = z.infer<typeof RoleSchema>;

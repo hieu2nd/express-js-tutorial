@@ -10,7 +10,7 @@ import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
-import { adminAuthRouter } from "./api/admin/auth/authRouter";
+import { adminAuthRouter } from "./api/admin/auth/authRouter.admin";
 import { adminCategoryRouter } from "./api/admin/category/categoryRouter.admin";
 import { adminProductRouter } from "./api/admin/product/productRouter.admin";
 import { adminStoreRouter } from "./api/admin/store/storeRouter.admin";

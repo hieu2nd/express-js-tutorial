@@ -3,7 +3,7 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { authenticateToken } from "@/common/middleware/authMiddleware";
+import { authenticateAdminToken } from "@/common/middleware/adminAuthMiddleware";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { productController } from "./productController.admin";
 import { CreateProductSchema, GetProductSchema, ProductSchema, UpdateProductSchema } from "./productModel.admin";
@@ -50,7 +50,12 @@ adminProductRegistry.registerPath({
   responses: createApiResponse(ProductSchema, "Success"),
 });
 
-adminProductRouter.post("/", authenticateToken, validateRequest(CreateProductSchema), productController.createProduct);
+adminProductRouter.post(
+  "/",
+  // authenticateAdminToken,
+  validateRequest(CreateProductSchema),
+  productController.createProduct,
+);
 
 //delete
 adminProductRegistry.registerPath({
@@ -71,7 +76,7 @@ adminProductRegistry.registerPath({
 
 adminProductRouter.delete(
   "/:id",
-  authenticateToken,
+  authenticateAdminToken,
   validateRequest(GetProductSchema),
   productController.deleteProduct,
 );
@@ -95,7 +100,7 @@ adminProductRegistry.registerPath({
 
 adminProductRouter.put(
   "/:id",
-  authenticateToken,
+  authenticateAdminToken,
   validateRequest(UpdateProductSchema),
   productController.updateProduct,
 );

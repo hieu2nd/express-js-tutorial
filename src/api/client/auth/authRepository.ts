@@ -53,7 +53,7 @@ class AuthRepository implements IAuthRepository {
 
       // Insert into account table
       const [accountResult] = await connection.query<ResultSetHeader>(
-        "INSERT INTO account (username, password, is_active, created_at, updated_at, is_deleted) VALUES (?, ?, 1, NOW(), NOW(), 0)",
+        "INSERT INTO account (username, password, role_id, is_active, created_at, updated_at, is_deleted) VALUES (?, ?, 3, 1, NOW(), NOW(), 0)",
         [registerData.username, hashedPassword],
       );
       const insertId = accountResult.insertId;

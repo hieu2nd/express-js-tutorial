@@ -1,6 +1,6 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 
-import { adminAuthRegistry } from "@/api/admin/auth/authRouter";
+import { adminAuthRegistry } from "@/api/admin/auth/authRouter.admin";
 import { adminCategoryRegistry } from "@/api/admin/category/categoryRouter.admin";
 import { adminProductRegistry } from "@/api/admin/product/productRouter.admin";
 import { adminStoreRegistry } from "@/api/admin/store/storeRouter.admin";
